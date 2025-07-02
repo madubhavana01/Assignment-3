@@ -1,76 +1,53 @@
-let display = document.getElementById('display');
-let operationDisplay = document.getElementById('operation-display');
-let currentInput = '';
-let operator = null;
-let firstOperand = null;
+let equal_pressed = 0;
+//Refer all buttons excluding AC and DEL
+let button_input = document.querySelectorAll(".input-button");
+//Refer input,equal,clear and erase
+let input = document.getElementById("input");
+let equal = document.getElementById("equal");
+let clear = document.getElementById("clear");
+let erase = document.getElementById("erase");
 
-function updateDisplay(value) {
-  display.value = value || '0';
-}
+window.onload = () => {
+  input.value = "";
+};
 
-function updateOperatorDisplay() {
-  if (operator && firstOperand !== null) {
-    operationDisplay.innerText = `${firstOperand} ${operator}`;
-  } else {
-    operationDisplay.innerText = '(none)';
+//Access each class using forEach
+button_input.forEach((button_class) => {
+  button_class.addEventListener("click", () => {
+    if (equal_pressed == 1) {
+      input.value = "";
+      equal_pressed = 0;
+    }
+    //display value of each button
+    input.value += button_class.value;
+  });
+});
+
+//Solve the user's input when clicked on equal sign
+equal.addEventListener("click", () => {
+  equal_pressed = 1;
+  let inp_val = input.value;
+  try {
+    //evaluate user's input
+    let solution = eval(inp_val);
+    //True for natural numbers
+    //false for decimals
+    if (Number.isInteger(solution)) {
+      input.value = solution;
+    } else {
+      input.value = solution.toFixed(2);
+    }
+  } catch (err) {
+    //If user has entered invalid input
+    alert("Invalid Input");
   }
-}
+});
 
-function appendNumber(num) {
-  currentInput += num;
-  updateDisplay(currentInput);
-}
-
-function clearDisplay() {
-  currentInput = '';
-  firstOperand = null;
-  operator = null;
-  updateDisplay('');
-  updateOperatorDisplay();
-}
-
-function backspace() {
-  currentInput = currentInput.slice(0, -1);
-  updateDisplay(currentInput);
-}
-
-function setOperator(op) {
-  if (currentInput === '') return;
-  firstOperand = parseFloat(currentInput);
-  operator = op;
-  currentInput = '';
-  updateOperatorDisplay();
-}
-
-function calculate() {
-  if (operator === null || currentInput === '') return;
-
-  let secondOperand = parseFloat(currentInput);
-  let result;
-
-  switch (operator) {
-    case '+': result = firstOperand + secondOperand; break;
-    case '-': result = firstOperand - secondOperand; break;
-    case '*': result = firstOperand * secondOperand; break;
-    case '/': result = secondOperand === 0 ? 'Error' : firstOperand / secondOperand; break;
-    case '%': result = (firstOperand * secondOperand) / 100; break;
-  }
-
-  updateDisplay(result);
-  currentInput = result.toString();
-  operator = null;
-  firstOperand = null;
-  updateOperatorDisplay();
-}
-
-function factorial() {
-  let num = parseFloat(currentInput);
-  if (isNaN(num) || num < 0 || !Number.isInteger(num)) {
-    updateDisplay("Err");
-    return;
-  }
-  let fact = 1;
-  for (let i = 2; i <= num; i++) fact *= i;
-  currentInput = fact.toString();
-  updateDisplay(currentInput);
-}
+//Clear Whole Input
+clear.addEventListener("click", () => {
+  input.value = "";
+});
+//Erase Single Digit
+erase.addEventListener("click", () => {
+  input.value = input.value.substr(0, input.value.length - 1);
+});
